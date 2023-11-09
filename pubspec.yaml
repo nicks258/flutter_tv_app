@@ -24,11 +24,12 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^7.0.0
-  custom_native_video_player_ios:
-    path: ./plugins/custom_native_video_player_ios
+  native_video_player: ^1.3.1
   custom_shared_preferences_ios:
-    path: ./plugins/custom_shared_preferences_ios
-
+    path: ../flutter_tv/plugins/custom_shared_preferences_ios
+  flutter_inappwebview: ^5.8.0
+  webview_flutter: ^4.4.2
+  webview_flutter_android: ^3.12.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

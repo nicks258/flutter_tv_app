@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tv/business/movies_bloc.dart';
 import 'package:flutter_tv/framework/remote_controller.dart';
 import 'package:flutter_tv/ui/focus/extensions.dart';
 import 'package:flutter_tv/ui/focus/scale_widget.dart';
 import 'package:flutter_tv/ui/movies_screen.dart';
+import 'package:flutter_tv/ui/webview_page.dart';
 import 'package:flutter_tv/ui/widgets/platform.dart';
 
 void main() {
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const screen = MoviesScreen();
+    const screen = WebViewPage();
     return MaterialApp(
       home: BlocProvider<MoviesBloc>(
           create: (_) => MoviesBloc()..add(MoviesEvent.initializing),

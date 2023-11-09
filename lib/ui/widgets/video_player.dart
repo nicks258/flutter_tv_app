@@ -1,6 +1,7 @@
-import 'package:custom_native_video_player_ios/native_video_player.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tv/ui/widgets/platform.dart';
+import 'package:native_video_player/native_video_player.dart';
 
 class PlayerPage extends StatefulWidget {
   const PlayerPage({Key? key, required this.path}) : super(key: key);
