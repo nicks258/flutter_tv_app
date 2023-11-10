@@ -1,7 +1,9 @@
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
 class WebViewPage extends StatefulWidget {
   const WebViewPage({Key? key}) : super(key: key);
 
@@ -15,8 +17,10 @@ class WebViewPageState extends State<WebViewPage> {
   int posY = 300;
   bool topScrollBar = false;
   bool botttomScrollBar = false;
+
   // InAppWebViewController? webViewController;
   late WebViewController controller;
+
   // InAppWebViewSettings settings = InAppWebViewSettings(
   //     useShouldOverrideUrlLoading: true,
   //     mediaPlaybackRequiresUserGesture: false,
@@ -25,12 +29,11 @@ class WebViewPageState extends State<WebViewPage> {
   //     iframeAllowFullscreen: true
   // );
   @override
-  void initState(){
+  void initState() {
     debugPrint("init state");
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFFFFFFFF))
-
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
@@ -54,18 +57,37 @@ class WebViewPageState extends State<WebViewPage> {
 
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: ()=> _exitApp(context),
+      onWillPop: () => _exitApp(context),
       child: Scaffold(
-        appBar: AppBar(title: Text("Chiku TV")),
+        appBar: AppBar(title: Text("Chiku TV"), actions: [
+          IconButton(
+              onPressed: () {
+                controller.goBack();
+              },
+              icon: Icon(Icons.keyboard_arrow_left)),
+          IconButton(
+              onPressed: () {
+                controller.reload();
+              },
+              icon: Icon(Icons.refresh)),
+          IconButton(
+              onPressed: () {
+                controller.goForward();
+              },
+              icon: Icon(Icons.keyboard_arrow_right)),
+        ]),
         body: Stack(
           children: [
             RawKeyboardListener(
                 focusNode: new FocusNode(),
                 onKey: (value) => handleKey(value, context),
-                child: WebViewWidget(controller: controller,)),
+                child: WebViewWidget(
+                  controller: controller,
+                )),
             Visibility(
               visible: topScrollBar,
               child: Positioned(
@@ -136,6 +158,7 @@ class WebViewPageState extends State<WebViewPage> {
       ),
     );
   }
+
   handleKey(RawKeyEvent key, BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
@@ -183,7 +206,7 @@ class WebViewPageState extends State<WebViewPage> {
           });
           break;
         case '23': //OK
-          controller.runJavaScriptReturningResult( """            
+          controller.runJavaScriptReturningResult("""            
             var cb = document.elementFromPoint($posX,$posY);
             cb.click();
             cb.focus(); 
@@ -196,13 +219,13 @@ class WebViewPageState extends State<WebViewPage> {
       setState(() {
         topScrollBar = true;
       });
-      controller.scrollBy( 0,  -20);
+      controller.scrollBy(0, -20);
       debugPrint("controller.scrollBy( 0,  -20);");
     } else if (posY > height - 5) {
       setState(() {
         botttomScrollBar = true;
       });
-      controller.scrollBy( 0, 20);
+      controller.scrollBy(0, 20);
       debugPrint("controller.scrollBy( 0,  20);");
     } else {
       setState(() {
@@ -212,17 +235,43 @@ class WebViewPageState extends State<WebViewPage> {
       debugPrint("going in else");
     }
   }
-  Future<bool> _exitApp(BuildContext context) async {
-    controller.goBack();
 
-    return Future.value(false);
-    // if (await controller.canGoBack()) {
-    //   print("onwill goback");
-    //   controller.goBack();
-    //   return Future.value(true);
-    // } else {
-    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("This will exit the app")));
-    //   return Future.value(false);
-    // }
+  Future<bool> _exitApp(BuildContext context) async {
+    final back = await controller.canGoBack();
+    debugPrint("can go back $back");
+    // controller.goBack();
+    //
+    // return Future.value(false);
+    if (await controller.canGoBack()) {
+      controller.goBack();
+      return Future.value(false);
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Exit from app"),
+            content: Text("Are you sure?"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    exit(0);
+                  },
+                  child: Text("Yes")),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "No",
+                    style: TextStyle(color: Colors.red),
+                  ))
+            ],
+          );
+        },
+      );
+      return Future.value(false);
+    }
   }
 }
