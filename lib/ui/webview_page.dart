@@ -1,10 +1,6 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'dart:async';
-import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 class WebViewPage extends StatefulWidget {
   const WebViewPage({Key? key}) : super(key: key);
@@ -30,26 +26,28 @@ class WebViewPageState extends State<WebViewPage> {
   // );
   @override
   void initState(){
-
+    debugPrint("init state");
     controller = WebViewController()
-      ..platform
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
+      ..setBackgroundColor(const Color(0xFFFFFFFF))
 
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
+            CircularProgressIndicator();
             // Update loading bar.
           },
-          onPageStarted: (String url) {},
+          onPageStarted: (String url) {
+            debugPrint("loading url is ${url}");
+          },
           onPageFinished: (String url) {},
           onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('https://www.youtube.com/')) {
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
+          // onNavigationRequest: (NavigationRequest request) {
+          //   if (request.url.startsWith('https://www.youtube.com/')) {
+          //     return NavigationDecision.prevent;
+          //   }
+          //   return NavigationDecision.navigate;
+          // },
         ),
       )
       ..loadRequest(Uri.parse('https://mhdtvworld.tv/'));
@@ -58,81 +56,84 @@ class WebViewPageState extends State<WebViewPage> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Stack(
-        children: [
-          RawKeyboardListener(
-              focusNode: new FocusNode(),
-              onKey: (value) => handleKey(value, context),
-              child: WebViewWidget(controller: controller,)),
-          Visibility(
-            visible: topScrollBar,
-            child: Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 25,
-                child: Center(
-                  child: Icon(Icons.keyboard_arrow_up),
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.blue.withOpacity(0.5),
-                      Colors.white.withOpacity(0.5)
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+    return WillPopScope(
+      onWillPop: ()=> _exitApp(context),
+      child: Scaffold(
+        appBar: AppBar(title: Text("Chiku TV")),
+        body: Stack(
+          children: [
+            RawKeyboardListener(
+                focusNode: new FocusNode(),
+                onKey: (value) => handleKey(value, context),
+                child: WebViewWidget(controller: controller,)),
+            Visibility(
+              visible: topScrollBar,
+              child: Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  height: 25,
+                  child: Center(
+                    child: Icon(Icons.keyboard_arrow_up),
                   ),
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.black.withOpacity(0.5),
-                      width: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blue.withOpacity(0.5),
+                        Colors.white.withOpacity(0.5)
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.black.withOpacity(0.5),
+                        width: 1,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          Visibility(
-            visible: botttomScrollBar,
-            child: Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 25,
-                child: Center(
-                  child: Icon(Icons.keyboard_arrow_down),
-                ),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.blue.withOpacity(0.5),
-                      Colors.white.withOpacity(0.5)
-                    ],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                  ),
-                  border: Border(
-                    top: BorderSide(
-                      color: Colors.black.withOpacity(0.5),
-                      width: 1,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-              left: posX.toDouble(),
-              top: posY.toDouble(),
-              child: Icon(Icons.mouse_outlined,color: Colors.amber,))
-        ],
+            // Visibility(
+            //   visible: botttomScrollBar,
+            //   child: Positioned(
+            //     bottom: 0,
+            //     left: 0,
+            //     right: 0,
+            //     child: Container(
+            //       height: 25,
+            //       child: Center(
+            //         child: Icon(Icons.keyboard_arrow_down),
+            //       ),
+            //       decoration: BoxDecoration(
+            //         gradient: LinearGradient(
+            //           colors: [
+            //             Colors.blue.withOpacity(0.5),
+            //             Colors.white.withOpacity(0.5)
+            //           ],
+            //           begin: Alignment.bottomCenter,
+            //           end: Alignment.topCenter,
+            //         ),
+            //         border: Border(
+            //           top: BorderSide(
+            //             color: Colors.black.withOpacity(0.5),
+            //             width: 1,
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // Positioned(
+            //     left: posX.toDouble(),
+            //     top: posY.toDouble(),
+            //     child: Image.asset("assets/icon/cursor.png",height: 48,width: 48,color: Colors.pinkAccent,))
+          ],
+        ),
+        resizeToAvoidBottomInset: false,
       ),
-      resizeToAvoidBottomInset: false,
     );
   }
   handleKey(RawKeyEvent key, BuildContext context) {
@@ -147,7 +148,7 @@ class WebViewPageState extends State<WebViewPage> {
       context.visitChildElements((element) {
         print("-> ${element.widget.key}");
       });
-      debugPrint("key press is ${_keyCode}");
+      debugPrint("key press is $_keyCode");
       switch (_keyCode) {
         case '19': //up
           setState(() {
@@ -190,7 +191,7 @@ class WebViewPageState extends State<WebViewPage> {
           break;
       }
     }
-    debugPrint("posY is ${posY} and height is ${height}");
+    debugPrint("posY is $posY and height is $height");
     if (posY < 5) {
       setState(() {
         topScrollBar = true;
@@ -210,5 +211,18 @@ class WebViewPageState extends State<WebViewPage> {
       });
       debugPrint("going in else");
     }
+  }
+  Future<bool> _exitApp(BuildContext context) async {
+    controller.goBack();
+
+    return Future.value(false);
+    // if (await controller.canGoBack()) {
+    //   print("onwill goback");
+    //   controller.goBack();
+    //   return Future.value(true);
+    // } else {
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("This will exit the app")));
+    //   return Future.value(false);
+    // }
   }
 }

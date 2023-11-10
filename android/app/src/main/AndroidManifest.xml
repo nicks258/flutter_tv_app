@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dev.flutter.tv.flutter_tv">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="flutter_tv"
-        android:icon="@mipmap/ic_launcher">
+        android:label="Chiku Tv"
+        android:icon="@mipmap/launcher_icon">
        <activity
+           android:usesCleartextTraffic="true"
            android:name=".MainActivity"
            android:exported="true"
            android:launchMode="singleTop"

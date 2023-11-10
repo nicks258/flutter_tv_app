@@ -5,7 +5,6 @@ import 'package:flutter_tv/business/movies_bloc.dart';
 import 'package:flutter_tv/framework/remote_controller.dart';
 import 'package:flutter_tv/ui/focus/extensions.dart';
 import 'package:flutter_tv/ui/focus/scale_widget.dart';
-import 'package:flutter_tv/ui/movies_screen.dart';
 import 'package:flutter_tv/ui/webview_page.dart';
 import 'package:flutter_tv/ui/widgets/platform.dart';
 
@@ -23,14 +22,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const screen = WebViewPage();
-    return MaterialApp(
-      home: BlocProvider<MoviesBloc>(
-          create: (_) => MoviesBloc()..add(MoviesEvent.initializing),
-          child: isScaled
-              ? ScaleWidget(
-                  child: screen,
-                )
-              : screen),
+    return Shortcuts(
+      shortcuts: <LogicalKeySet, Intent>{
+        LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
+      },
+      child: MaterialApp(home: screen),
     );
   }
 }
